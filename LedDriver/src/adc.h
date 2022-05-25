@@ -1,11 +1,17 @@
+/**
+* \file adc.h
+* \brief Analog-Digital Converter module
+*
+* This module contains functions to implement an AD converter
+*
+* \author Filipe Loureiro & Miguel Silva
+* \date 25/05/22
+* \version 1.1
+* \bug No bugs detected
+*/
 
-#include <zephyr.h>
-#include <device.h>
-#include <drivers/gpio.h>
-#include <drivers/adc.h>
-#include <string.h>
+#include "base.h"
 
-#include <hal/nrf_saadc.h>
 #define ADC_NID DT_NODELABEL(adc) 
 #define ADC_RESOLUTION 10
 #define ADC_GAIN ADC_GAIN_1_4
@@ -16,3 +22,5 @@
 #define ADC_CHANNEL_INPUT NRF_SAADC_INPUT_AIN1 
 #define BUFFER_SIZE 1
 #define TIMER_INTERVAL_MSEC 1000
+
+void adc_init();
