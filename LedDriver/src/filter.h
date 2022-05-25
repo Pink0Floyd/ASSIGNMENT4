@@ -1,11 +1,12 @@
-
 /**
 * \file filter.h
-* \brief This module contains functions to implement the smart filter required
+* \brief Smart Filter module
+*
+* This module contains functions to implement the smart filter required
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 1.1
+* \version 2.2
 * \bug No bugs detected
 */
 
