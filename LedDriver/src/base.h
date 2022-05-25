@@ -1,10 +1,12 @@
 /**
 * \file base.h
-* \brief This file contain the basic includes and variables for general porpouse
+* \brief Base file
+*
+* This file contain the basic includes and macros for general porpouse
 *
 * \author Filipe Loureiro & Miguel Silva
-* \date 08/05/22
-* \version 1.2
+* \date 25/05/22
+* \version 1.3
 * \bug No bugs detected
 */
 
