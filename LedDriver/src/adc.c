@@ -4,7 +4,6 @@
 void adc_init()
 {
 
-      const struct device *adc_dev = NULL;
       int err=0;
 
       /* ADC setup: bind and initialize */
@@ -22,11 +21,10 @@ void adc_init()
       
       /* It is recommended to calibrate the SAADC at least once before use, and whenever the ambient temperature has changed by more than 10 °C */
       NRF_SAADC->TASKS_CALIBRATEOFFSET = 1;
-      return adc_dev;
 }
 
 /* Takes one sample */
-void sample(struct device *adc_dev)
+void adc_sample()
 {
 	int ret;
 	const struct adc_sequence sequence = {

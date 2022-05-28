@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.2
+* \version 2.3
 * \bug No bugs detected
 */
 
@@ -37,7 +37,7 @@ static const struct adc_channel_cfg adc_conf = {
 };
 
 // Global Variables:
-//const struct device *adc_dev = NULL;
+static const struct device *adc_dev = NULL;
 static uint16_t adc_sample_buffer[BUFFER_SIZE];
 
 
@@ -60,10 +60,9 @@ void adc_init();
 *
 * Read a sample from ADC previosly configurated and return it
 *
-* \param [IN] struct device *adc  -> the pointer for adc struct
 * \date 25/04/22
 * \bug No bugs detected
 */
-void adc_sample(struct device *adc_dev);
+void adc_sample();
 
 #endif
