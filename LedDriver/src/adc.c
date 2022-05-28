@@ -1,9 +1,12 @@
 
 #include "adc.h"
 
+// Global Variables:
+static const struct device *adc_dev = NULL;
+static uint16_t adc_sample_buffer[BUFFER_SIZE];
+
 void adc_init()
 {
-
       int err=0;
 
       /* ADC setup: bind and initialize */
@@ -21,6 +24,8 @@ void adc_init()
       
       /* It is recommended to calibrate the SAADC at least once before use, and whenever the ambient temperature has changed by more than 10 °C */
       NRF_SAADC->TASKS_CALIBRATEOFFSET = 1;
+
+	printk("Intialised ADC module\n");
 }
 
 /* Takes one sample */

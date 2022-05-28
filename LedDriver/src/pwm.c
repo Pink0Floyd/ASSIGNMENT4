@@ -13,18 +13,16 @@ void pwm_init()
 	    printk("Error: Failed to bind to PWM0\n r");
 	    return;
       }
-      else  
-      {
-	    printk("Bind to PWM0 successful\n\r");            
-      }
+      printk("Initialized PWM module\n");
 }
 
 void pwm_led_set(uint16_t dutty_cycle)
 {
       int ret=0;
       ret = pwm_pin_set_usec(pwm0_dev, LED1, pwmPeriod_us,(unsigned int)(dutty_cycle), PWM_POLARITY_NORMAL);
-      if (ret) {
-                printk("Error %d: failed to set pulse width\n", ret);
+      if (ret)
+	{
+		printk("Error %d: failed to set pulse width\n", ret);
 		return;
-            }
+      }
 }

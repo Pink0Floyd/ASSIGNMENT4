@@ -36,11 +36,6 @@ static const struct adc_channel_cfg adc_conf = {
 	//.input_positive = ADC_CHANNEL_INPUT
 };
 
-// Global Variables:
-static const struct device *adc_dev = NULL;
-static uint16_t adc_sample_buffer[BUFFER_SIZE];
-
-
 ///////////////////////////////////////////////////////////////////////////////////////
 //  Public Functions:
 

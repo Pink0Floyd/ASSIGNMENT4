@@ -66,7 +66,6 @@ uint16_t read_avg()
 
 void filter_init()
 {
-	printk("Initialized filter operation\n");
 	uint8_t k=0;
 	while(k<FILTER_BUFFER_SIZE)
 	{
@@ -76,6 +75,7 @@ void filter_init()
 	buffer.pointer=FILTER_BUFFER_SIZE-1;
 	buffer.count=0;
 	buffer.samples_avg=0;
+	printk("Initialized filter operation\n");
 }
 
 uint16_t filter(uint16_t in)
