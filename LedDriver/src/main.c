@@ -5,6 +5,36 @@
 #include "filter.h"
 #include "pwm.h"
 
+/*
+
+void main()
+{
+	printk("\n\n\n\n\n\n");
+	filter_init();
+
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(0));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(240));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(120));
+	printk("%u \n",filter(240));
+	
+}
+
+*/
+
 #define TOTAL_SAMPLES 144		///< total samples until the end of program
 #define SAMPLING_PERIOD 1000		///< sampling period in miliseconds
 
@@ -30,8 +60,8 @@ const int64_t sampling_period=1000;		///< sampling thread period
 struct k_sem sem_sample;			///< sample ready semafore
 struct k_sem sem_filtsample;			///< filtered sample ready semafore
 
-uint16_t filt_input;
-uint1&_t filt_out;
+uint16_t filt_in;
+uint16_t filt_out;
 
 void sampling(void* A,void* B,void* C)
 {
@@ -39,7 +69,7 @@ void sampling(void* A,void* B,void* C)
 	int64_t end_time=k_uptime_get()+sampling_period;
 	while(1)
 	{
-		filt_input=adc_sample();
+		filt_in=adc_sample();
 		k_sem_give(&sem_sample);
 
 		curr_time=k_uptime_get();			// sleep until next sampling period
@@ -54,7 +84,7 @@ void filtering(void* A,void* B,void* C)
 {
 	while(1)
 	{
-		k_sem_take(&sem_sample);
+		k_sem_take(&sem_sample,K_FOREVER);
 		filt_out=filter(filt_in);
 		k_sem_give(&sem_filtsample);
 	}
@@ -64,8 +94,8 @@ void actuating(void* A,void* B,void* C)
 {
 	while(1)
 	{
-		k_sem_take(&sem_filtsample);
-		pwm_led_set(filt_out);
+		k_sem_take(&sem_filtsample,K_FOREVER);
+		pwm_led_set(filt_out*100/1023);
 	}
 }
 
