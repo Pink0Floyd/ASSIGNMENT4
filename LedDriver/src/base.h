@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.4
+* \version 2.5
 * \bug No bugs detected
 */
 
@@ -25,5 +25,6 @@
 #include <stdint.h>
 #include <drivers/adc.h>
 #include <hal/nrf_saadc.h>
+#include <drivers/pwm.h>
 
 #endif
