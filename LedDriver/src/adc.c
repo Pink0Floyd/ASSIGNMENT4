@@ -24,7 +24,7 @@ void adc_init()
 }
 
 /* Takes one sample */
-void adc_sample()
+uint16_t adc_sample()
 {
 	int ret;
 	const struct adc_sequence sequence = {
@@ -38,4 +38,6 @@ void adc_sample()
 	if (ret) {
             printk("adc_read() failed with code %d\n", ret);
 	}	
+
+	return adc_sample_buffer[0]; 
 }

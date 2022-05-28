@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.3
+* \version 2.4
 * \bug No bugs detected
 */
 
@@ -49,7 +49,6 @@ static uint16_t adc_sample_buffer[BUFFER_SIZE];
 *
 * Initializes the ADC in order to use it 
 *
-* \date 25/04/22
 * \bug No bugs detected
 */
 void adc_init();
@@ -60,9 +59,9 @@ void adc_init();
 *
 * Read a sample from ADC previosly configurated and return it
 *
-* \date 25/04/22
+* \return Return the read value from adc
 * \bug No bugs detected
 */
-void adc_sample();
+uint16_t adc_sample();
 
 #endif
