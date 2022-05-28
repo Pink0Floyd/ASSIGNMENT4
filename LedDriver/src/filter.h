@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.2
+* \version 2.3
 * \bug No bugs detected
 */
 
@@ -24,10 +24,40 @@ typedef struct filter_buffer
 	uint16_t samples_avg;
 }filter_buffer;
 
+/**
+* \brief Filter initialisation function
+*
+* Initialises the filter buffer necessary for its operation
+*
+* \bug No bugs detected
+*/
 void filter_init();
 
+/**
+* \brief Filter insertion function
+*
+* Inserts a new sample in the filter buffer
+*
+* \param [IN] sample to be inserted
+* \bug No bugs detected
+*/
 void insert_sample(uint16_t sample);
 
+/**
+* \brief Filter averaging function
+*
+* Calculates the average of the samples in the filter buffer except the oldest
+*
+* \bug No bugs detected
+*/
 void avg_samples();
 
+/**
+* \brief Filter average reading function
+*
+* Returns the last average calculated
+*
+* \return last average calculated
+* \bug No bugs detected
+*/
 uint16_t read_avg();
