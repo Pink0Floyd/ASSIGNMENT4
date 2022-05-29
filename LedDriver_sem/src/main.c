@@ -8,8 +8,7 @@
 #define PRINT_INIT 1		///< enable for thread initialisation prints
 #define PRINT_LOOP 0		///< enable for thread loop prints
 
-#define TOTAL_SAMPLES 144		///< total samples until the end of program
-#define SAMPLING_PERIOD 1000		///< sampling period in miliseconds
+#define SAMPLING_PERIOD 2		///< sampling period in miliseconds
 
 #define SAMPLING_PRIO 1			///< sampling thread priority
 #define FILTERING_PRIO 1		///< filtering thread priority
@@ -29,7 +28,6 @@ k_tid_t filtering_tid;			///< filtering thread initialisation
 struct k_thread actuating_data;	///< actuating thread initialisation
 k_tid_t actuating_tid;			///< actuating thread initialisation
 
-const int64_t sampling_period=2;		///< sampling thread period
 struct k_sem sem_sample;			///< sample ready semafore
 struct k_sem sem_filtsample;			///< filtered sample ready semafore
 
@@ -41,7 +39,7 @@ void sampling(void* A,void* B,void* C)
 	if(PRINT_INIT)
 	printk("Launched sampling thread\n");
 	int64_t curr_time=k_uptime_get();
-	int64_t end_time=k_uptime_get()+sampling_period;
+	int64_t end_time=k_uptime_get()+SAMPLING_PERIOD;
 	while(1)
 	{
 		filt_in=adc_sample();			// sample 
@@ -56,7 +54,7 @@ void sampling(void* A,void* B,void* C)
 		{							// sleep until next sampling period
 			k_msleep(end_time-curr_time);		// sleep until next sampling period
 		}							// sleep until next sampling period
-		end_time+=sampling_period;			// sleep until next sampling period
+		end_time+=SAMPLING_PERIOD;			// sleep until next sampling period
 	}
 }
 

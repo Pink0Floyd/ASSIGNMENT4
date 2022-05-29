@@ -5,11 +5,7 @@
 #include "filter.h"
 #include "pwm.h"
 
-#define PRINT_INIT 1		///< enable for thread initialisation prints
-#define PRINT_LOOP 0		///< enable for thread loop prints
-
-#define TOTAL_SAMPLES 144		///< total samples until the end of program
-#define SAMPLING_PERIOD 1000		///< sampling period in miliseconds
+#define SAMPLING_PERIOD 2
 
 #define SAMPLING_PRIO 1			///< sampling thread priority
 #define FILTERING_PRIO 1		///< filtering thread priority
@@ -29,86 +25,73 @@ k_tid_t filtering_tid;			///< filtering thread initialisation
 struct k_thread actuating_data;	///< actuating thread initialisation
 k_tid_t actuating_tid;			///< actuating thread initialisation
 
-const int64_t sampling_period=2;		///< sampling thread period
-struct k_sem sem_sample;			///< sample ready semafore
-struct k_sem sem_filtsample;			///< filtered sample ready semafore
+struct k_fifo filt_in;			///< variable to carry a sample between sampling and filtering
+struct k_fifo filt_out;			///< variable to carry a filtered sample between filtering and actuating
 
-uint16_t filt_in;				///< variable to carry a sample between sampling and filtering
-uint16_t filt_out;			///< variable to carry a filtered sample between filtering and actuating
+struct data_pack
+{
+    void *fifo_reserved;
+    uint16_t data;
+};
 
 void sampling(void* A,void* B,void* C)
 {
-	if(PRINT_INIT)
-	printk("Launched sampling thread\n");
 	int64_t curr_time=k_uptime_get();
-	int64_t end_time=k_uptime_get()+sampling_period;
+	int64_t end_time=k_uptime_get()+SAMPLING_PERIOD;
+
+	struct data_pack sent_data;
+
 	while(1)
 	{
-		filt_in=adc_sample();			// sample 
-		if(PRINT_LOOP)
-		printk("sampling: sampled ADC for %u\n",filt_in);
-		k_sem_give(&sem_sample);
-		if(PRINT_LOOP)
-		printk("sampling: supplied a sample to filtering\n");
+		sent_data.data=adc_sample();				// sample
+//		printk("sampled %u \n",sent_data.data);
+		k_fifo_put(&filt_in,&sent_data);			// transmit sample
 
 		curr_time=k_uptime_get();			// sleep until next sampling period
 		if(curr_time<end_time)				// sleep until next sampling period
 		{							// sleep until next sampling period
 			k_msleep(end_time-curr_time);		// sleep until next sampling period
 		}							// sleep until next sampling period
-		end_time+=sampling_period;			// sleep until next sampling period
+		end_time+=SAMPLING_PERIOD;			// sleep until next sampling period
 	}
 }
 
 void filtering(void* A,void* B,void* C)
 {
-	if(PRINT_INIT)
-	printk("Launched filtering thread\n");
+	struct data_pack* received_data;
+	struct data_pack sent_data;
+
 	while(1)
 	{
-		if(PRINT_LOOP)
-		printk("filtering: waiting for a sample from sampling\n");
-		k_sem_take(&sem_sample,K_FOREVER);
-		if(PRINT_LOOP)
-		printk("filtering: got a sample from sampling\n");
-		filt_out=filter(filt_in);						// filter
-		if(PRINT_LOOP)
-		printk("filtering: filtered %u sample to %u\n",filt_in,filt_out);
-		k_sem_give(&sem_filtsample);
-		if(PRINT_LOOP)
-		printk("filtering: supplied a filtered sample to actuating\n");
+		received_data=k_fifo_get(&filt_in,K_FOREVER);				// receive sample
+		sent_data.data=filter(received_data->data);				// filter
+//		printk("%u filtered %u \n",received_data->data,sent_data.data);
+		k_fifo_put(&filt_out,&sent_data);						// transmit filtered sample
 	}
 }
 
 void actuating(void* A,void* B,void* C)
 {
-	if(PRINT_INIT)
-	printk("Launched actuating thread\n");
+	struct data_pack* received_data;
+
 	while(1)
 	{
-		if(PRINT_LOOP)
-		printk("actuating: waiting for a filtered sample from filtering\n");
-		k_sem_take(&sem_filtsample,K_FOREVER);
-		if(PRINT_LOOP)
-		printk("actuating: got a filtered sample from filtering\n");
-		pwm_led_set(filt_out*100/1023);						// act
-		if(!PRINT_LOOP)
-		printk("%u\n",filt_out);
-		if(PRINT_LOOP)
-		printk("actuating: led has been set to %u\n",filt_out);
+		received_data=k_fifo_get(&filt_out,K_FOREVER);				// receive filtered sample
+		printk("actuated with %u\n",received_data->data);
+		pwm_led_set(received_data->data*100/1023);				// act
 	}
 }
 
 void main()
 {
-	printk("\n\n\nLed Driver (with semafores)\n");
+	printk("\n\n\nLed Driver (with fifo)\n");
 
 	adc_init();
 	filter_init();
 	pwm_init();
 
-	k_sem_init(&sem_sample, 0, 1);
-	k_sem_init(&sem_filtsample, 0, 1);
+	k_fifo_init(&filt_in);
+	k_fifo_init(&filt_out);
 
 	sampling_tid=k_thread_create(&sampling_data,sampling_stack,K_THREAD_STACK_SIZEOF(sampling_stack),	// create sampling thread
 		sampling,NULL,NULL,NULL,SAMPLING_PRIO,0,K_NO_WAIT);								// create sampling thread
