@@ -15,10 +15,11 @@
 
 #include "base.h"
 
+#define ADC_MIN_VALUE 0
+#define ADC_MAX_VALUE 1023
 
 #define ADC_NID DT_NODELABEL(adc) 
 #define ADC_RESOLUTION 10
-#define BUFFER_SIZE 1
 #define TIMER_INTERVAL_MSEC 1000
 
 // Parameters for adc Struct Configuration
@@ -29,7 +30,7 @@
 #define ADC_CHANNEL_INPUT NRF_SAADC_INPUT_AIN1 
 
 // ADC channel struct Configuration:
-static const struct adc_channel_cfg adc_conf = {
+static struct adc_channel_cfg adc_conf = {
 	.gain = ADC_GAIN,
 	.reference = ADC_REFERENCE,
 	.acquisition_time = ADC_ACQUISITION_TIME,

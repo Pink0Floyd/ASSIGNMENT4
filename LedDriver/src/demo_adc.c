@@ -1,4 +1,4 @@
-/*
+ /*
  * Paulo Pedreiras, 2022/03
  * Simple ADC example - nRF52840DK_nRF52840 board
  * 

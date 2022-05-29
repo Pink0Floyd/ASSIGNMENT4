@@ -2,8 +2,8 @@
 #include "adc.h"
 
 // Global Variables:
-static const struct device *adc_dev = NULL;
-static uint16_t adc_sample_buffer[BUFFER_SIZE];
+static struct device *adc_dev = NULL;
+static uint16_t adc_sample_buffer;
 
 void adc_init()
 {
@@ -31,7 +31,6 @@ void adc_init()
 /* Takes one sample */
 uint16_t adc_sample()
 {
-	int ret;
 	const struct adc_sequence sequence = {
 		.channels=BIT(ADC_CHANNEL_ID),
 		.buffer=adc_sample_buffer,
@@ -39,10 +38,19 @@ uint16_t adc_sample()
 		.resolution=ADC_RESOLUTION,
 	};
 
-	ret = adc_read(adc_dev, &sequence);
+	int ret = adc_read(adc_dev, &sequence);
 	if (ret) {
             printk("adc_read() failed with code %d\n", ret);
-	}	
+	}
 
-	return adc_sample_buffer[0]; 
+	if(adc_sample_buffer>ADC_MAX_VALUE)
+	{
+		adc_sample_buffer=ADC_MAX_VALUE;
+	}
+	else if(adc_sample_buffer<ADC_MIN_VALUE)
+	{
+		adc_sample_buffer=ADC_MIN_VALUE;
+	}
+	
+	return adc_sample_buffer; 
 }

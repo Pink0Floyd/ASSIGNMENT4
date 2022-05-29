@@ -25,7 +25,7 @@ void insert_sample(uint16_t sample)
 	{
 		buffer.count++;
 	}
-	printk("buffer has %u samples\n",buffer.count);
+//	printk("buffer has %u samples\n",buffer.count);
 }
 
 void avg_samples()
@@ -36,23 +36,23 @@ void avg_samples()
 	}
 	else if(buffer.count>0&&buffer.count<FILTER_BUFFER_SIZE)
 	{
-		printk("avg resized from %u",buffer.samples_avg);
+//		printk("avg resized from %u",buffer.samples_avg);
 		buffer.samples_avg=buffer.samples_avg*(buffer.count-1)/buffer.count;
-		printk(" to %u \n",buffer.samples_avg);
+//		printk(" to %u \n",buffer.samples_avg);
 
-		printk("added %u to the avg %u ",buffer.array[buffer.pointer],buffer.samples_avg);
+//		printk("added %u to the avg %u ",buffer.array[buffer.pointer],buffer.samples_avg);
 		buffer.samples_avg+=buffer.array[buffer.pointer]/buffer.count;
-		printk("becoming avg %u \n",buffer.samples_avg);
+//		printk("becoming avg %u \n",buffer.samples_avg);
 	}
 	else if(buffer.count>=FILTER_BUFFER_SIZE)
 	{
-		printk("removed %u contribution to %u",buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE],buffer.samples_avg);
+//		printk("removed %u contribution to %u",buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE],buffer.samples_avg);
 		buffer.samples_avg-=buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE]/(FILTER_BUFFER_SIZE-1);
-		printk(" becoming %u \n",buffer.samples_avg);
+//		printk(" becoming %u \n",buffer.samples_avg);
 
-		printk("added %u to the avg %u ",buffer.array[buffer.pointer],buffer.samples_avg);
+//		printk("added %u to the avg %u ",buffer.array[buffer.pointer],buffer.samples_avg);
 		buffer.samples_avg+=buffer.array[buffer.pointer]/(FILTER_BUFFER_SIZE-1);
-		printk("becoming avg %u \n",buffer.samples_avg);
+//		printk("becoming avg %u \n",buffer.samples_avg);
 	}
 }
 
@@ -75,7 +75,7 @@ void filter_init()
 	buffer.pointer=FILTER_BUFFER_SIZE-1;
 	buffer.count=0;
 	buffer.samples_avg=0;
-	printk("Initialized filter operation\n");
+	printk("Initialised filter operation\n");
 }
 
 uint16_t filter(uint16_t in)

@@ -42,11 +42,11 @@ void main()
 #define FILTERING_PRIO 1		///< filtering thread priority
 #define ACTUATING_PRIO 1		///< actuating thread priority
 
-#define SAMPLING_STACK_SIZE 256						///< sampling thread stack size
+#define SAMPLING_STACK_SIZE 1024						///< sampling thread stack size
 K_THREAD_STACK_DEFINE(sampling_stack,SAMPLING_STACK_SIZE);		///< sampling thread stack size
-#define FILTERING_STACK_SIZE 256						///< filtering thread stack size
+#define FILTERING_STACK_SIZE 512						///< filtering thread stack size
 K_THREAD_STACK_DEFINE(filtering_stack,FILTERING_STACK_SIZE);	///< filtering thread stack size
-#define ACTUATING_STACK_SIZE 256						///< actuating thread stack size
+#define ACTUATING_STACK_SIZE 512						///< actuating thread stack size
 K_THREAD_STACK_DEFINE(actuating_stack,ACTUATING_STACK_SIZE);	///< actuating thread stack size
 
 struct k_thread sampling_data;	///< sampling thread initialisation
@@ -56,7 +56,7 @@ k_tid_t filtering_tid;			///< filtering thread initialisation
 struct k_thread actuating_data;	///< actuating thread initialisation
 k_tid_t actuating_tid;			///< actuating thread initialisation
 
-const int64_t sampling_period=1000;		///< sampling thread period
+const int64_t sampling_period=30000;	///< sampling thread period
 struct k_sem sem_sample;			///< sample ready semafore
 struct k_sem sem_filtsample;			///< filtered sample ready semafore
 
@@ -65,37 +65,50 @@ uint16_t filt_out;
 
 void sampling(void* A,void* B,void* C)
 {
+	printk("Launched sampling thread\n");
 	int64_t curr_time=k_uptime_get();
 	int64_t end_time=k_uptime_get()+sampling_period;
 	while(1)
 	{
 		filt_in=adc_sample();
+		printk("sampling: sampled ADC for %u\n",filt_in);
 		k_sem_give(&sem_sample);
+		printk("sampling: supplied a sample to filtering\n");
 
 		curr_time=k_uptime_get();			// sleep until next sampling period
 		if(curr_time<end_time)				// sleep until next sampling period
 		{							// sleep until next sampling period
 			k_msleep(end_time-curr_time);		// sleep until next sampling period
 		}							// sleep until next sampling period
+		end_time+=sampling_period;			// sleep until next sampling period
 	}
 }
 
 void filtering(void* A,void* B,void* C)
 {
+	printk("Launched filtering thread\n");
 	while(1)
 	{
+		printk("filtering: waiting for a sample from sampling\n");
 		k_sem_take(&sem_sample,K_FOREVER);
+		printk("filtering: got a sample from sampling\n");
 		filt_out=filter(filt_in);
+		printk("filtering: filtered %u sample to %u\n",filt_in,filt_out);
 		k_sem_give(&sem_filtsample);
+		printk("filtering: supplied a filtered sample to actuating\n");
 	}
 }
 
 void actuating(void* A,void* B,void* C)
 {
+	printk("Launched actuating thread\n");
 	while(1)
 	{
+		printk("actuating: waiting for a filtered sample from filtering\n");
 		k_sem_take(&sem_filtsample,K_FOREVER);
+		printk("actuating: got a filtered sample from filtering\n");
 		pwm_led_set(filt_out*100/1023);
+		printk("actuating: led has been set to %u\n",filt_out);
 	}
 }
 

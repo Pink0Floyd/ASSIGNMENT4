@@ -15,12 +15,13 @@
 
 #include "base.h"
 #include "leds.h"
+#include "gpio.h"
 
 #define PWM0_NID DT_NODELABEL(pwm0) 
 
 // Global Variables:
 
-static const struct device *pwm0_dev;		// Pointer to PWM device structure 
+static struct device *pwm0_dev;		// Pointer to PWM device structure 
 static unsigned int pwmPeriod_us = 1000;		// PWM priod in us
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -38,10 +39,9 @@ void pwm_init();
 /**
 * \brief 
 *
-*\param [IN] uint16_t dutty_cycle                -> Dutty cycle to set the PWM with
-*
+*\param [IN] uint16_t duty_cycle to set the PWM
 * \bug No bugs detected
 */
-void pwm_led_set(uint16_t dutty_cycle);
+void pwm_led_set(uint16_t duty_cycle);
 
 #endif
