@@ -17,11 +17,7 @@ struct device *gpio0_init()
   if(gpio0_dev==NULL)
   {
     printk("Failed to bind to GPIO0\n\r");        
-  }
-  else
-  {
-    printk("Bind to GPIO0 successfull \n\r");        
-  }    
+  }  
 
   return gpio0_dev;
 }

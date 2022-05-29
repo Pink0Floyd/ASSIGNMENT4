@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.6
+* \version 2.7
 * \bug No bugs detected
 */
 
@@ -15,12 +15,11 @@
 
 #include "base.h"
 
-#define ADC_MIN_VALUE 0
-#define ADC_MAX_VALUE 1023
+#define ADC_MIN_VALUE 0		///< minimum value to be interpreted by the ADC
+#define ADC_MAX_VALUE 1023	///< maximum value to be interpreted by the ADC
 
 #define ADC_NID DT_NODELABEL(adc) 
 #define ADC_RESOLUTION 10
-#define TIMER_INTERVAL_MSEC 1000
 
 // Parameters for adc Struct Configuration
 #define ADC_GAIN ADC_GAIN_1_4

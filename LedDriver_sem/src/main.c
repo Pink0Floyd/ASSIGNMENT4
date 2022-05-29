@@ -5,8 +5,8 @@
 #include "filter.h"
 #include "pwm.h"
 
-#define PRINT_INIT 1
-#define PRINT_LOOP 0
+#define PRINT_INIT 1		///< enable for thread initialisation prints
+#define PRINT_LOOP 0		///< enable for thread loop prints
 
 #define TOTAL_SAMPLES 144		///< total samples until the end of program
 #define SAMPLING_PERIOD 1000		///< sampling period in miliseconds
@@ -29,12 +29,12 @@ k_tid_t filtering_tid;			///< filtering thread initialisation
 struct k_thread actuating_data;	///< actuating thread initialisation
 k_tid_t actuating_tid;			///< actuating thread initialisation
 
-const int64_t sampling_period=40;		///< sampling thread period
+const int64_t sampling_period=2;		///< sampling thread period
 struct k_sem sem_sample;			///< sample ready semafore
 struct k_sem sem_filtsample;			///< filtered sample ready semafore
 
-uint16_t filt_in;
-uint16_t filt_out;
+uint16_t filt_in;				///< variable to carry a sample between sampling and filtering
+uint16_t filt_out;			///< variable to carry a filtered sample between filtering and actuating
 
 void sampling(void* A,void* B,void* C)
 {
@@ -44,7 +44,7 @@ void sampling(void* A,void* B,void* C)
 	int64_t end_time=k_uptime_get()+sampling_period;
 	while(1)
 	{
-		filt_in=adc_sample();
+		filt_in=adc_sample();			// sample 
 		if(PRINT_LOOP)
 		printk("sampling: sampled ADC for %u\n",filt_in);
 		k_sem_give(&sem_sample);
@@ -71,7 +71,7 @@ void filtering(void* A,void* B,void* C)
 		k_sem_take(&sem_sample,K_FOREVER);
 		if(PRINT_LOOP)
 		printk("filtering: got a sample from sampling\n");
-		filt_out=filter(filt_in);
+		filt_out=filter(filt_in);						// filter
 		if(PRINT_LOOP)
 		printk("filtering: filtered %u sample to %u\n",filt_in,filt_out);
 		k_sem_give(&sem_filtsample);
@@ -91,7 +91,7 @@ void actuating(void* A,void* B,void* C)
 		k_sem_take(&sem_filtsample,K_FOREVER);
 		if(PRINT_LOOP)
 		printk("actuating: got a filtered sample from filtering\n");
-		pwm_led_set(filt_out*100/1023);
+		pwm_led_set(filt_out*100/1023);						// act
 		if(!PRINT_LOOP)
 		printk("%u\n",filt_out);
 		if(PRINT_LOOP)
@@ -101,7 +101,7 @@ void actuating(void* A,void* B,void* C)
 
 void main()
 {
-	printk("\n\n\nStart\n");
+	printk("\n\n\nLed Driver (with semafores)\n");
 
 	adc_init();
 	filter_init();
@@ -110,12 +110,12 @@ void main()
 	k_sem_init(&sem_sample, 0, 1);
 	k_sem_init(&sem_filtsample, 0, 1);
 
-	sampling_tid=k_thread_create(&sampling_data,sampling_stack,K_THREAD_STACK_SIZEOF(sampling_stack),
-		sampling,NULL,NULL,NULL,SAMPLING_PRIO,0,K_NO_WAIT);
+	sampling_tid=k_thread_create(&sampling_data,sampling_stack,K_THREAD_STACK_SIZEOF(sampling_stack),	// create sampling thread
+		sampling,NULL,NULL,NULL,SAMPLING_PRIO,0,K_NO_WAIT);								// create sampling thread
 
-	filtering_tid=k_thread_create(&filtering_data,filtering_stack,K_THREAD_STACK_SIZEOF(filtering_stack),
-		filtering,NULL,NULL,NULL,FILTERING_PRIO,0,K_NO_WAIT);
+	filtering_tid=k_thread_create(&filtering_data,filtering_stack,K_THREAD_STACK_SIZEOF(filtering_stack),	// create filtering thread
+		filtering,NULL,NULL,NULL,FILTERING_PRIO,0,K_NO_WAIT);								// create filtering thread
 
-	actuating_tid=k_thread_create(&actuating_data,actuating_stack,K_THREAD_STACK_SIZEOF(actuating_stack),
-		actuating,NULL,NULL,NULL,ACTUATING_PRIO,0,K_NO_WAIT);
+	actuating_tid=k_thread_create(&actuating_data,actuating_stack,K_THREAD_STACK_SIZEOF(actuating_stack),	// create actuating thread
+		actuating,NULL,NULL,NULL,ACTUATING_PRIO,0,K_NO_WAIT);								// create actuating thread
 }
