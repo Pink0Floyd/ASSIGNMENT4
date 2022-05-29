@@ -14,17 +14,14 @@ uint16_t read_avg()
 int insert_sample(uint16_t sample)
 {
 	sample=sample%(MAX_SAMPLE_VALUE+1);
-	printk("\tentered %i sample\n",(int16_t)sample);
 	if(buffer.count>=FILTER_BUFFER_SIZE)
 	{
 		if(sample<read_avg()-FILTER_THRESHOLD)			// smart filter threshold operation
 		{									// smart filter threshold operation
-			printk("\tLow Spike sample rejected\n");		// smart filter threshold operation
 			return -1;							// smart filter threshold operation
 		}									// smart filter threshold operation
 		else if(sample>read_avg()+FILTER_THRESHOLD)		// smart filter threshold operation
 		{									// smart filter threshold operation
-			printk("\tHigh Spike sample rejected\n");		// smart filter threshold operation
 			return -1;							// smart filter threshold operation
 		}									// smart filter threshold operation
 	}
@@ -35,37 +32,22 @@ int insert_sample(uint16_t sample)
 
 	buffer.pointer=(buffer.pointer+1)%FILTER_BUFFER_SIZE;			// update pointer
 	buffer.array[buffer.pointer]=sample;					// insert accepted sample
-	printk("\tinserted sample in position %u\n",buffer.pointer);
-	printk("\tbuffer has %u samples\n",buffer.count);
 	return 0;
 }
 
 void avg_samples()
 {
-	if(buffer.count==0)
-	{
-		buffer.samples_avg=buffer.array[buffer.pointer];
-	}
-	else if(buffer.count>0&&buffer.count<FILTER_BUFFER_SIZE)
-	{
-		printk("\tavg resized from %i",(int16_t)buffer.samples_avg);
-		buffer.samples_avg=buffer.samples_avg*(buffer.count-1)/buffer.count;
-		printk(" to %i\n",(int16_t)buffer.samples_avg);
+	if(buffer.count>0&&buffer.count<FILTER_BUFFER_SIZE)					// buffer not full
+	{													//
+		buffer.samples_avg=buffer.samples_avg*(buffer.count-1)/buffer.count;	// resize past samples contribution
+		buffer.samples_avg+=buffer.array[buffer.pointer]/buffer.count;		// add new sample contribution
+	}													//
 
-		printk("\tadded %i to the avg %i",(int16_t)buffer.array[buffer.pointer],(int16_t)buffer.samples_avg);
-		buffer.samples_avg+=buffer.array[buffer.pointer]/buffer.count;
-		printk(" becoming avg %i\n",(int16_t)buffer.samples_avg);
-	}
-	else if(buffer.count>=FILTER_BUFFER_SIZE)
-	{
-		printk("\tremoved %i contribution to %i",(int16_t)buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE],(int16_t)buffer.samples_avg);
-		buffer.samples_avg-=buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE]/(FILTER_BUFFER_SIZE-1);
-		printk(" becoming %i\n",(int16_t)buffer.samples_avg);
-
-		printk("\tadded %i to the avg %i",(int16_t)buffer.array[buffer.pointer],(int16_t)buffer.samples_avg);
-		buffer.samples_avg+=buffer.array[buffer.pointer]/(FILTER_BUFFER_SIZE-1);
-		printk(" becoming avg %i\n",(int16_t)buffer.samples_avg);
-	}
+	else if(buffer.count>=FILTER_BUFFER_SIZE)												// buffer full
+	{																		//
+		buffer.samples_avg-=buffer.array[(buffer.pointer+1)%FILTER_BUFFER_SIZE]/(FILTER_BUFFER_SIZE-1);		// remove oldest sample contribution
+		buffer.samples_avg+=buffer.array[buffer.pointer]/(FILTER_BUFFER_SIZE-1);					// add new sample contribution
+	}																		//
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
