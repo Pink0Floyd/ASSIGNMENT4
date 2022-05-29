@@ -6,7 +6,7 @@
 *
 * \author Filipe Loureiro & Miguel Silva
 * \date 25/05/22
-* \version 2.5
+* \version 2.6
 * \bug No bugs detected
 */
 

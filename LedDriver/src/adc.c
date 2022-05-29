@@ -33,7 +33,7 @@ uint16_t adc_sample()
 {
 	const struct adc_sequence sequence = {
 		.channels=BIT(ADC_CHANNEL_ID),
-		.buffer=adc_sample_buffer,
+		.buffer=&adc_sample_buffer,
 		.buffer_size=sizeof(adc_sample_buffer),
 		.resolution=ADC_RESOLUTION,
 	};
