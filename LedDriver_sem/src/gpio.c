@@ -1,5 +1,5 @@
-#include "gpio.h"
 
+#include "gpio.h"
 
 /*
   const struct device *gpio0_dev;
@@ -17,7 +17,6 @@ struct device *gpio0_init()
   if(gpio0_dev==NULL)
   {
     printk("Failed to bind to GPIO0\n\r");        
-    return;
   }
   else
   {
@@ -44,7 +43,6 @@ struct device *gpio1_init()
   if(gpio1_dev==NULL)
   {
     printk("Failed to bind to GPIO1\n\r");        
-    return;
   }
   else
   {

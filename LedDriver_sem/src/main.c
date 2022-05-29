@@ -5,36 +5,6 @@
 #include "filter.h"
 #include "pwm.h"
 
-/*
-
-void main()
-{
-	printk("\n\n\n\n\n\n");
-	filter_init();
-
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(0));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(240));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(120));
-	printk("%u \n",filter(240));
-	
-}
-
-*/
-
 #define PRINT_INIT 1
 #define PRINT_LOOP 0
 
@@ -59,11 +29,9 @@ k_tid_t filtering_tid;			///< filtering thread initialisation
 struct k_thread actuating_data;	///< actuating thread initialisation
 k_tid_t actuating_tid;			///< actuating thread initialisation
 
-const int64_t sampling_period=5;		///< sampling thread period
+const int64_t sampling_period=40;		///< sampling thread period
 struct k_sem sem_sample;			///< sample ready semafore
 struct k_sem sem_filtsample;			///< filtered sample ready semafore
-
-uint16_t aux=0;
 
 uint16_t filt_in;
 uint16_t filt_out;
@@ -77,13 +45,6 @@ void sampling(void* A,void* B,void* C)
 	while(1)
 	{
 		filt_in=adc_sample();
-		/*
-		filt_in=aux++;
-		if(aux>1023)
-		{
-			aux=0;
-		}
-		*/
 		if(PRINT_LOOP)
 		printk("sampling: sampled ADC for %u\n",filt_in);
 		k_sem_give(&sem_sample);
@@ -131,7 +92,8 @@ void actuating(void* A,void* B,void* C)
 		if(PRINT_LOOP)
 		printk("actuating: got a filtered sample from filtering\n");
 		pwm_led_set(filt_out*100/1023);
-		printk("%u \n",filt_out);
+		if(!PRINT_LOOP)
+		printk("%u\n",filt_out);
 		if(PRINT_LOOP)
 		printk("actuating: led has been set to %u\n",filt_out);
 	}

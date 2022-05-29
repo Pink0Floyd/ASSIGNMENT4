@@ -14,15 +14,14 @@
 #define PWM_H 
 
 #include "base.h"
-#include "leds.h"
 #include "gpio.h"
 
-#define PWM0_NID DT_NODELABEL(pwm0) 
+#define PWM0_NID DT_NODELABEL(pwm0)
 
-// Global Variables:
-
-static struct device *pwm0_dev;		// Pointer to PWM device structure 
-static unsigned int pwmPeriod_us = 1000;		// PWM priod in us
+#define LED1 13                                             // LED1 pin number of GPIO_0
+#define LED2 14                                             // LED2 pin number of GPIO_0
+#define LED3 15                                             // LED3 pin number of GPIO_0
+#define LED4 16                                             // LED4 pin number of GPIO_0
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //  Public Functions:

@@ -6,7 +6,6 @@ project(LedDriver_sem)
 
 target_sources(app PRIVATE src/main.c)
 target_sources(app PRIVATE src/gpio.c)
-target_sources(app PRIVATE src/leds.c)
 target_sources(app PRIVATE src/adc.c)
 target_sources(app PRIVATE src/filter.c)
 target_sources(app PRIVATE src/pwm.c)
