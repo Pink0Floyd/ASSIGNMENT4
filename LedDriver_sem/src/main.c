@@ -8,7 +8,7 @@
 #define PRINT_INIT 1		///< enable for thread initialisation prints
 #define PRINT_LOOP 0		///< enable for thread loop prints
 
-#define SAMPLING_PERIOD 2		///< sampling period in miliseconds
+#define SAMPLING_PERIOD 1000		///< sampling period in miliseconds
 
 #define SAMPLING_PRIO 1			///< sampling thread priority
 #define FILTERING_PRIO 1		///< filtering thread priority
@@ -38,6 +38,7 @@ void sampling(void* A,void* B,void* C)
 {
 	if(PRINT_INIT)
 	printk("Launched sampling thread\n");
+
 	int64_t curr_time=k_uptime_get();
 	int64_t end_time=k_uptime_get()+SAMPLING_PERIOD;
 	while(1)
@@ -69,7 +70,11 @@ void filtering(void* A,void* B,void* C)
 		k_sem_take(&sem_sample,K_FOREVER);
 		if(PRINT_LOOP)
 		printk("filtering: got a sample from sampling\n");
+		if(!PRINT_LOOP)
+		printk("\t%u ->",filt_in);
 		filt_out=filter(filt_in);						// filter
+		if(!PRINT_LOOP)
+		printk(" %u \n",filt_out);
 		if(PRINT_LOOP)
 		printk("filtering: filtered %u sample to %u\n",filt_in,filt_out);
 		k_sem_give(&sem_filtsample);
@@ -90,10 +95,8 @@ void actuating(void* A,void* B,void* C)
 		if(PRINT_LOOP)
 		printk("actuating: got a filtered sample from filtering\n");
 		pwm_led_set(filt_out*100/1023);						// act
-		if(!PRINT_LOOP)
-		printk("%u\n",filt_out);
 		if(PRINT_LOOP)
-		printk("actuating: led has been set to %u\n",filt_out);
+		printk("actuating: led has been set to %u %%\n",filt_out*100/1023);
 	}
 }
 

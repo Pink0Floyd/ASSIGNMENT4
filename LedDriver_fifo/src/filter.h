@@ -14,7 +14,7 @@
 
 #define MAX_SAMPLE_VALUE 1023			///< max sample value
 #define FILTER_BUFFER_SIZE 11			///< number of samples in each average plus the excluded old sample
-#define FILTER_THRESHOLD 24			///< range of values centered in the sample average allowed for a sample value
+#define FILTER_THRESHOLD 120			///< range of values centered in the sample average allowed for a sample value
 
 typedef struct filter_buffer
 {
